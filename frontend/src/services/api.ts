@@ -1,6 +1,8 @@
 import axios from 'axios'
 
-const api = axios.create({ baseURL: 'http://localhost:5000/api' })
+const api = axios.create({
+  baseURL: "https://hayhgang-projeto.onrender.com/api"
+})
 
 api.interceptors.request.use((config) => {
   const stored = localStorage.getItem('auth-storage')
@@ -8,7 +10,7 @@ api.interceptors.request.use((config) => {
     try {
       const { state } = JSON.parse(stored)
       if (state?.token) config.headers.Authorization = `Bearer ${state.token}`
-    } catch {}
+    } catch { }
   }
   return config
 })
