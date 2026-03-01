@@ -13,6 +13,7 @@ import AdminDashboard from './pages/admin/AdminDashboard'
 import AdminProducts from './pages/admin/AdminProducts'
 import AdminProductForm from './pages/admin/AdminProductForm'
 import AdminOrders from './pages/admin/AdminOrders'
+import LookBook from './pages/LookBook'
 
 export default function App() {
   return (
@@ -51,6 +52,7 @@ export default function App() {
               <Route path="/login" element={<Login />} />
               <Route path="/register" element={<Register />} />
               <Route path="/checkout" element={<Checkout />} />
+              <Route path="/lookbook" element={<LookBook />} />
             </Routes>
             <Footer />
           </>

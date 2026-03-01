@@ -2,6 +2,7 @@ import { Link } from 'react-router-dom'
 import { ArrowRight } from 'lucide-react'
 import FeaturedProducts from '../components/home/FeaturedProducts'
 import PromoStrip from '../components/home/PromoStrip'
+import LookbookSection from '../components/home/LookBookSection'
 
 export default function Home() {
   return (
@@ -67,6 +68,7 @@ export default function Home() {
           </Link>
         </div>
       </section>
+<LookbookSection />
 
       {/* Category grid */}
       <section className="max-w-7xl mx-auto px-4 md:px-8 py-8 pb-20">
