@@ -239,7 +239,7 @@ export default function AdminProductForm() {
             <label className={labelClass}>Imagens (URLs)</label>
             <div className="flex gap-2 mb-3">
               <input
-                type="url" value={imageInput}
+                type="text" value={imageInput}
                 onChange={(e) => setImageInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && (e.preventDefault(), addImage())}
                 placeholder="https://... cole a URL da imagem"
