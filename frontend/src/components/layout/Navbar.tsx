@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { ShoppingBag, User, Search, X } from 'lucide-react'
+import { ShoppingBag, Menu, X, User, Search } from 'lucide-react'
 import { useCartStore } from '../../store/cartStore'
 import { useAuthStore } from '../../store/authStore'
 
@@ -20,6 +20,7 @@ export default function Navbar() {
   const { user, logout } = useAuthStore()
   const navigate = useNavigate()
   const count = itemCount()
+  const menuRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
     const handleScroll = () => setScrolled(window.scrollY > 10)
@@ -27,10 +28,15 @@ export default function Navbar() {
     return () => window.removeEventListener('scroll', handleScroll)
   }, [])
 
-  // Bloqueia scroll do body quando menu aberto
+  // Fecha o menu ao clicar fora
   useEffect(() => {
-    document.body.style.overflow = menuOpen ? 'hidden' : ''
-    return () => { document.body.style.overflow = '' }
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false)
+      }
+    }
+    if (menuOpen) document.addEventListener('mousedown', handleClickOutside)
+    return () => document.removeEventListener('mousedown', handleClickOutside)
   }, [menuOpen])
 
   return (
@@ -100,16 +106,48 @@ export default function Navbar() {
               )}
             </button>
 
-            {/* Hamburger animado */}
-            <button
-              className="md:hidden flex flex-col justify-center items-center gap-[5px] w-8 h-8 p-1"
-              onClick={() => setMenuOpen(!menuOpen)}
-              aria-label="Menu"
-            >
-              <span className={`block w-5 h-[1.5px] bg-ink transition-all duration-300 origin-center ${menuOpen ? 'rotate-45 translate-y-[6.5px]' : ''}`} />
-              <span className={`block w-5 h-[1.5px] bg-ink transition-all duration-300 ${menuOpen ? 'opacity-0 scale-x-0' : ''}`} />
-              <span className={`block w-5 h-[1.5px] bg-ink transition-all duration-300 origin-center ${menuOpen ? '-rotate-45 -translate-y-[6.5px]' : ''}`} />
-            </button>
+            {/* Hamburger — mobile */}
+            <div className="md:hidden relative" ref={menuRef}>
+              <button
+                className="text-ink p-1 w-8 h-8 flex flex-col justify-center items-center gap-[5px]"
+                onClick={() => setMenuOpen(!menuOpen)}
+                aria-label="Menu"
+              >
+                <span className={`block w-5 h-[1.5px] bg-current transition-all duration-300 origin-center ${menuOpen ? 'rotate-45 translate-y-[6.5px]' : ''}`} />
+                <span className={`block w-5 h-[1.5px] bg-current transition-all duration-300 ${menuOpen ? 'opacity-0 scale-x-0' : ''}`} />
+                <span className={`block w-5 h-[1.5px] bg-current transition-all duration-300 origin-center ${menuOpen ? '-rotate-45 -translate-y-[6.5px]' : ''}`} />
+              </button>
+
+              {/* Dropdown pequeno */}
+              {menuOpen && (
+                <div className="absolute right-0 top-full mt-2 w-52 bg-white border border-border shadow-xl z-50 rounded-sm overflow-hidden">
+                  {NAV_LINKS.map((l) => (
+                    <Link
+                      key={l.label}
+                      to={l.to}
+                      onClick={() => setMenuOpen(false)}
+                      className="block px-4 py-3 text-xs uppercase tracking-wider text-ink hover:bg-card hover:text-accent transition-colors border-b border-border/40 last:border-b-0"
+                    >
+                      {l.label}
+                    </Link>
+                  ))}
+
+                  {/* Divider */}
+                  {!user && (
+                    <div className="border-t border-border">
+                      <Link to="/login" onClick={() => setMenuOpen(false)}
+                        className="block px-4 py-3 text-xs uppercase tracking-wider text-ink hover:bg-card transition-colors border-b border-border/40">
+                        Entrar
+                      </Link>
+                      <Link to="/register" onClick={() => setMenuOpen(false)}
+                        className="block px-4 py-3 text-xs uppercase tracking-wider text-ink hover:bg-card transition-colors">
+                        Cadastrar
+                      </Link>
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
           </div>
         </div>
 
@@ -122,63 +160,6 @@ export default function Navbar() {
           </div>
         )}
       </nav>
-
-      {/* Mobile menu — overlay full screen */}
-      <div className={`fixed inset-0 bg-bg z-40 flex flex-col md:hidden transition-opacity duration-300 ${menuOpen ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'}`}>
-
-        {/* Promo bar replica */}
-        <div className="bg-ink py-2" />
-
-        {/* Topo do menu */}
-        <div className="h-14 flex items-center justify-between px-4 border-b border-border flex-shrink-0">
-          <Link to="/" className="font-display text-lg tracking-widest text-ink" onClick={() => setMenuOpen(false)}>
-            HAYH GANG
-          </Link>
-          <button onClick={() => setMenuOpen(false)} className="text-ink p-1">
-            <X size={20} />
-          </button>
-        </div>
-
-        {/* Links de navegação */}
-        <div className="flex flex-col px-6 pt-4 flex-1 overflow-y-auto">
-          {NAV_LINKS.map((l) => (
-            <Link key={l.label} to={l.to} onClick={() => setMenuOpen(false)}
-              className="font-display text-3xl py-4 tracking-wider text-ink hover:text-muted transition-colors border-b border-border/30 last:border-b-0">
-              {l.label}
-            </Link>
-          ))}
-
-          {/* Busca mobile */}
-          <div className="mt-6 flex items-center gap-3 border border-border px-3 py-2.5">
-            <Search size={14} className="text-muted flex-shrink-0" />
-            <input type="text" placeholder="Buscar..."
-              onKeyDown={(e) => { if (e.key === 'Enter') { navigate(`/shop?search=${(e.target as HTMLInputElement).value}`); setMenuOpen(false) } }}
-              className="w-full bg-transparent text-xs text-ink placeholder-muted focus:outline-none uppercase tracking-wider" />
-          </div>
-
-          {/* Botões login/cadastro se não logado */}
-          {!user && (
-            <div className="flex gap-3 mt-4">
-              <Link to="/login" onClick={() => setMenuOpen(false)}
-                className="flex-1 bg-ink text-white py-3 text-xs uppercase tracking-widest text-center hover:bg-accent transition-colors">
-                Entrar
-              </Link>
-              <Link to="/register" onClick={() => setMenuOpen(false)}
-                className="flex-1 border border-border text-ink py-3 text-xs uppercase tracking-widest text-center hover:border-ink transition-colors">
-                Cadastrar
-              </Link>
-            </div>
-          )}
-        </div>
-
-        {/* Rodapé do menu */}
-        <div className="px-6 py-8 flex gap-6 border-t border-border/30 flex-shrink-0">
-          <a href="https://www.instagram.com/hayhgang/" target="_blank" rel="noreferrer"
-            className="text-xs uppercase tracking-widest text-muted hover:text-ink transition-colors">Instagram</a>
-          <a href="https://wa.me/7192055641" target="_blank" rel="noreferrer"
-            className="text-xs uppercase tracking-widest text-muted hover:text-ink transition-colors">WhatsApp VIP</a>
-        </div>
-      </div>
     </>
   )
 }
