@@ -3,8 +3,6 @@ import { ArrowRight } from 'lucide-react'
 import FeaturedProducts from '../components/home/FeaturedProducts'
 import PromoStrip from '../components/home/PromoStrip'
 import LookbookSection from '../components/home/LookBookSection'
-import Tshirt3D from '../components/home/Tshirt3D'
-
 
 export default function Home() {
   return (
@@ -48,8 +46,6 @@ export default function Home() {
 
       {/* Promo Strip */}
       <PromoStrip />
-
-      <Tshirt3D />
 
       {/* Featured Products */}
       <section className="max-w-7xl mx-auto px-4 md:px-8 py-16">
