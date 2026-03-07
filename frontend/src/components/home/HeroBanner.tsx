@@ -7,7 +7,7 @@ const SLIDES = [
     img: 'https://res.cloudinary.com/dnwa5ur7x/image/upload/v1772400513/IMG_3010_ufsmbs.jpg',
     tag: 'DROP 01',
     title: 'STREETWEAR\nDIFERENCIADO',
-    sub: 'Salvador, Bahia — 2025',
+    sub: 'Salvador, Bahia — 2026',
   },
   {
     img: 'https://res.cloudinary.com/dnwa5ur7x/image/upload/v1772400521/IMG_2071_adebua.jpg',

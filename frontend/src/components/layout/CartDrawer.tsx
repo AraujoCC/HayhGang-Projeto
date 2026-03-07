@@ -1,14 +1,26 @@
 import { X, Trash2, ShoppingBag, ArrowRight } from 'lucide-react'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
 import { useCartStore } from '../../store/cartStore'
+import { useAuthStore } from '../../store/authStore'
 
 export default function CartDrawer() {
   const { items, isOpen, closeCart, removeItem, updateQuantity, total } = useCartStore()
+  const { user } = useAuthStore()
+  const navigate = useNavigate()
   const totalValue = total()
   const freeShipping = totalValue >= 299
   const shippingLeft = 299 - totalValue
 
   if (!isOpen) return null
+
+  const handleCheckout = () => {
+    closeCart()
+    if (!user) {
+      navigate('/login')
+    } else {
+      navigate('/checkout')
+    }
+  }
 
   return (
     <>
@@ -116,10 +128,15 @@ export default function CartDrawer() {
                 <span className="text-xs text-green-600 font-medium uppercase tracking-wider">Grátis</span>
               </div>
             )}
-            <Link to="/checkout" onClick={closeCart}
+            {!user && (
+              <p className="text-[11px] text-center text-muted uppercase tracking-wider">
+                Faça login para finalizar o pedido
+              </p>
+            )}
+            <button onClick={handleCheckout}
               className="flex items-center justify-center gap-2 w-full bg-ink text-white py-4 text-xs uppercase tracking-widest font-medium hover:bg-accent transition-colors">
-              Finalizar Pedido <ArrowRight size={14} />
-            </Link>
+              {user ? 'Finalizar Pedido' : 'Entrar e Finalizar'} <ArrowRight size={14} />
+            </button>
             <button onClick={closeCart}
               className="w-full text-center text-xs uppercase tracking-wider text-muted hover:text-ink transition-colors">
               Continuar comprando
